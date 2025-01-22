@@ -1,3 +1,4 @@
+import { compareArrays } from '../utility'
 import { Ship } from './Ship'
 
 export class GameBoard {
@@ -5,7 +6,7 @@ export class GameBoard {
     this.board = Array(10)
       .fill()
       .map(() => Array(10).fill(null))
-    this.hitTiles = []
+    this.struckTiles = []
     this.ships = []
     this.isGameOver = false
   }
@@ -15,11 +16,11 @@ export class GameBoard {
     for (let i = 0; i < ship.length; i++) {
       if (direction === 'vertical') {
         if (this.#isInBounds(x, y - i) && this.#isEmpty(x, y - i)) {
-          this.board[y - i][x] = ship
+          this.board[x][y - i] = ship
         }
       } else if (direction === 'horizontal') {
         if (this.#isInBounds(x - i, y) && this.#isEmpty(x - i, y)) {
-          this.board[y][x - i] = ship
+          this.board[x - i][y] = ship
         }
       }
     }
@@ -31,17 +32,39 @@ export class GameBoard {
     if (cords === undefined || cords.length < 2) {
       throw new Error('Coordinates are not provided!')
     }
-
-    const [x, y] = cords
-    if (this.hitTiles.includes(JSON.stringify([x, y]))) {
+    if (this.isStruck(cords)) {
       return
     }
-    this.hitTiles.push(JSON.stringify([x, y]))
+    this.struckTiles.push(cords)
 
-    if (this.board[y][x] instanceof Ship) {
-      this.board[y][x].hit()
+    const [x, y] = cords
+
+    if (this.board[x][y] instanceof Ship) {
+      this.board[x][y].hit()
       this.#areAllShipsSunk()
     }
+  }
+  isStruck(cords) {
+    let isStruck = false
+    this.struckTiles.forEach((tile) => {
+      if (compareArrays(tile, cords)) {
+        isStruck = true
+      }
+    })
+    return isStruck
+  }
+  simulateComputerMove() {
+    let randomTile = [
+      Math.floor(Math.random() * 10),
+      Math.floor(Math.random() * 10)
+    ]
+    while (this.isStruck(randomTile)) {
+      randomTile = [
+        Math.floor(Math.random() * 10),
+        Math.floor(Math.random() * 10)
+      ]
+    }
+    this.receiveAttack(randomTile)
   }
   #areAllShipsSunk() {
     if (
@@ -58,7 +81,7 @@ export class GameBoard {
     return true
   }
   #isEmpty(x, y) {
-    if (this.board[y][x] instanceof Ship) {
+    if (this.board[x][y] instanceof Ship) {
       throw new Error('Ship collision!')
     }
     return true

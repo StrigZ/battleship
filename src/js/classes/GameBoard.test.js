@@ -15,19 +15,19 @@ describe('GameBoard class', () => {
       const gameBoard = new GameBoard()
       const ship = new Ship(4)
       gameBoard.placeShip([4, 4], 'vertical', ship)
-      expect(gameBoard.board[1][4]).toStrictEqual(ship)
-      expect(gameBoard.board[2][4]).toStrictEqual(ship)
-      expect(gameBoard.board[3][4]).toStrictEqual(ship)
       expect(gameBoard.board[4][4]).toStrictEqual(ship)
+      expect(gameBoard.board[4][3]).toStrictEqual(ship)
+      expect(gameBoard.board[4][2]).toStrictEqual(ship)
+      expect(gameBoard.board[4][1]).toStrictEqual(ship)
     })
     it('Should have a way to place ship horizontally', () => {
       const gameBoard = new GameBoard()
       const ship = new Ship(4)
       gameBoard.placeShip([4, 4], 'horizontal', ship)
-      expect(gameBoard.board[4][1]).toStrictEqual(ship)
-      expect(gameBoard.board[4][2]).toStrictEqual(ship)
-      expect(gameBoard.board[4][3]).toStrictEqual(ship)
       expect(gameBoard.board[4][4]).toStrictEqual(ship)
+      expect(gameBoard.board[3][4]).toStrictEqual(ship)
+      expect(gameBoard.board[2][4]).toStrictEqual(ship)
+      expect(gameBoard.board[1][4]).toStrictEqual(ship)
     })
     it('Should throw an error if two ships collides with each other', () => {
       const gameBoard = new GameBoard()
@@ -53,18 +53,18 @@ describe('GameBoard class', () => {
       const gameBoard = new GameBoard()
       expect(() => gameBoard.receiveAttack([1, 3])).not.toThrow(Error)
     })
-    it('Should increase hitTaken property of the ship on passed cords', () => {
+    it('Should increase hitsTaken property of the ship on passed cords', () => {
       const gameBoard = new GameBoard()
       const ship = new Ship(4)
       gameBoard.placeShip([4, 4], 'vertical', ship)
       gameBoard.receiveAttack([4, 4])
-      expect(ship.hitTaken).toBe(1)
+      expect(ship.hitsTaken).toBe(1)
     })
-    it("Should add passed coordinates to hitTiles array if it doesn't exist already", () => {
+    it("Should add passed coordinates to struckTiles array if it doesn't exist already", () => {
       const gameBoard = new GameBoard()
       gameBoard.receiveAttack([4, 4])
       expect(gameBoard.board[4][4]).toBe(null)
-      expect(gameBoard.hitTiles).toContain(JSON.stringify([4, 4]))
+      expect(gameBoard.struckTiles).toContainEqual([4, 4])
     })
     it('Should do nothing if tile at these coordinates was hit already', () => {
       const gameBoard = new GameBoard()
@@ -72,7 +72,7 @@ describe('GameBoard class', () => {
       gameBoard.placeShip([4, 4], 'vertical', ship)
       gameBoard.receiveAttack([4, 4])
       gameBoard.receiveAttack([4, 4])
-      expect(ship.hitTaken).toBe(1)
+      expect(ship.hitsTaken).toBe(1)
     })
     it('Should throw an error if cords are not provided', () => {
       const gameBoard = new GameBoard()
@@ -95,7 +95,7 @@ describe('GameBoard class', () => {
   it('Should keep track of missed attacks so they can display them properly', () => {
     const gameBoard = new GameBoard()
     gameBoard.receiveAttack([1, 1])
-    expect(gameBoard.hitTiles).toContain(JSON.stringify([1, 1]))
+    expect(gameBoard.struckTiles).toContainEqual([1, 1])
   })
   it('Should be able to report whether or not all of their ships have been sunk.', () => {
     const gameBoard = new GameBoard()
